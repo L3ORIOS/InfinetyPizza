@@ -23,7 +23,16 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'rol',
     ];
+
+     /**
+     * Un usuario puede tener muchos pedidos.
+     */
+    public function pedidos(): HasMany
+    {
+        return $this->hasMany(Pedido::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
