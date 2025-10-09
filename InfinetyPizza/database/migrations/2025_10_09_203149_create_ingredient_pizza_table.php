@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pizzas', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->unique();
-            $table->text('description');
-            $table->decimal('price',8,2);
-            $table->timestamps();
+        Schema::create('ingredient_pizza', function (Blueprint $table) {
+            $table->foreignId('ingrediente_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('pizza_id')->constrained()->cascadeOnDelete();
+            $table->primary(['ingrediente_id','pizza_id']);
         });
     }
 
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pizzas');
+        Schema::dropIfExists('ingredient_pizza');
     }
 };
