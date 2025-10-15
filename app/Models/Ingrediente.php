@@ -10,7 +10,7 @@ class Ingrediente extends Model
     /** @use HasFactory<\Database\Factories\IngredienteFactory> */
     use HasFactory;
 
-    protected $fillable = ['nombre'];
+    protected $fillable = ['name'];
 
     /**
      * Un ingrediente pertenece a muchas pizzas.
