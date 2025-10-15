@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('pedidos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('users_id')->constrained('users');
+            $table->foreignId('user_id')->constrained('users');
             $table->foreignId('pizza_id')->constrained('pizzas');
             $table->datetime('fecha_hora_pedido');
             $table->timestamps();
