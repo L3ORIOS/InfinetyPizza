@@ -31,4 +31,16 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 });
 
+
+Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
+
+    // Dashboard del administrador
+    Route::get('/dashboard', function () {
+        return view('admin.dashboard'); // Crea esta vista
+    })->name('admin.dashboard');
+
+    // Rutas para la gestión de CRUDs (Pizzas, Ingredientes, etc.)
+    // Route::resource('pizzas', App\Http\Controllers\PizzaController::class);
+    // Route::resource('ingredientes', App\Http\Controllers\IngredienteController::class);
+});
 require __DIR__.'/auth.php';

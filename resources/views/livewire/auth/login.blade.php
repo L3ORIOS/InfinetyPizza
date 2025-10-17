@@ -49,8 +49,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
+        if ($user->is_admin) {
+            // Redirige al administrador a su panel protegido
+            $this->redirect(route('admin.dashboard', absolute: false), navigate: true);
+        return; // Detiene la ejecución
+    }
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
+
 
     /**
      * Validate the user's credentials.

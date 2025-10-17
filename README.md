@@ -31,7 +31,12 @@ Prueba Técnica – Desarrollador/a Laravel + Livewire
         - [Pizza](#seeder-pizza)
         - [Pedido](#seeder-pedido)
         - [Base de Datos Final](#base-de-datos-final)
-- [Autenticación](#configuración-de-autenticación-y-administrador)
+- [Autenticación y Gestion de roles](#configuración-de-autenticación-y-administrador)
+    - [Autenticación Breeze](#autenticación-breeze)
+    - [Apariencia](#apariencia)
+    - [Autorización](#autorización)
+    - [Redirección Post-Login](#redirección-post-login)
+- [Panel de Administrador](#panel-administrador)
    
 
 ## Introducción
@@ -293,7 +298,7 @@ Cree un pedido por pizza asignándolo al cliente de prueba con el fin de tener u
 
 ### Base de Datos Final
 
-Después de ejecutar el comando **php artisan migrate:fresh --seed** la base de datos se creo correctamente y los seeders poblaron los datos de prueba.
+Después de ejecutar el comando **php artisan migrate:fresh --seed** la base de datos se creo correctamente y los seeders poblaron los datos de prueba. 
 #### User
 <img src="./sources/image-21.png" width="450">
 
@@ -311,7 +316,44 @@ Después de ejecutar el comando **php artisan migrate:fresh --seed** la base de 
 
 
 
-### Configuración de Autenticación y Administrador  
+## Configuración de Autenticación y Gestion de Roles
+
+### Autenticación Breeze
+
+El sistema utiliza Laravel Breeze y la arquitectura Livewire/Blade para manejar la autenticación (Login, Registro, Recuperación de Contraseña y Verificación de Email). Breeze utiliza sesiones y cookies para mantener la identidad del usuario logueado.
+
+
+### Apariencia
+
+Se realizaron ajustes mínimos en las plantillas de para personalizar el aspecto visual:
+
+- Logo/Favicon: Se reemplazaron los íconos predeterminado de Laravel por el logo de Infinety Pizza para mantener la identidad visual del proyecto.
+
+### Autorización  
+
+Se utiliza la configuración de Laravel a traves  de un middleware para asegurar que:
+
+- Los administradores sean redirigidos al Panel de Administración (/admin/dashboard).
+- Los cientes sean redirigidos a la pagina de inicio del cliente (/dashboard).
+
+<img src="./sources/image-26.png" width="450">
+
+#### Rutas protegidas
+
+Todas las rutas que formaran parte del panel de administración se agruparan y se les aplicaran el middleware AuthzMiddleware ('admin') junto con el middleware estándar de autenticación ('auth').
+
+<img src="./sources/image-27.png" width="450">
+
+
+### Redirección Post-Login
+
+La lógica de inicio de sesión se modificó para redirigir a los usuarios a un dashboard específico basado en su rol, en lugar de usar la ruta por defecto (/dashboard) para todos.
+
+Se identificó el componente de Livewire/Volt que maneja el inicio de sesión (app/Livewire/auth/login.blade.php) y se modificó el método login()
+
+<img src="./sources/image-28.png" width="450">
+
+## Panel Administrador
 
 ## Extensiones utilizadas en VS Code
 
