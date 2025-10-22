@@ -1,10 +1,14 @@
 {
     "cSpell.language": "en,es-ES",
     "cSpell.words": [
+        "forelse",
         "Infinety",
         "laravel",
         "Laravel",
+        "Livewire",
         "logueado",
-        "Redirección"
+        "Redirección",
+        "tbody",
+        "thead"
     ]
 }
