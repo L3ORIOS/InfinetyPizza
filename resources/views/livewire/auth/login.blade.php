@@ -52,8 +52,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         if ($user->is_admin) {
             // Redirige al administrador a su panel protegido
             $this->redirect(route('admin.dashboard', absolute: false), navigate: true);
-        return; // Detiene la ejecución
-    }
+            return; // Detiene la ejecución
+        }
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
 

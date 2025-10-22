@@ -42,5 +42,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     // Rutas para la gestión de CRUDs (Pizzas, Ingredientes, etc.)
     // Route::resource('pizzas', App\Http\Controllers\PizzaController::class);
     // Route::resource('ingredientes', App\Http\Controllers\IngredienteController::class);
+    Volt::route('ingredientes', 'admin.ingredientes.index')->name('admin.ingredientes.index');
+    //Volt::route('ingredientes/create', 'admin.ingredientes.create')->name('admin.ingredientes.create');
+    Volt::route('ingredientes/edit', 'admin.ingredientes.edit')->name('admin.ingredientes.edit');
+
 });
 require __DIR__.'/auth.php';

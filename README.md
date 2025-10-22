@@ -355,6 +355,36 @@ Se identificó el componente de Livewire/Volt que maneja el inicio de sesión (a
 
 ## Panel Administrador
 
+El bloque de administración solo aparece si el usuaria autenticado es admin. Esto en el componente sidebar que utiliza la aplicación.
+
+**resources\views\components\layouts\app\sidebar.blade.php**
+
+<img src="./sources/image-29.png" width="450">
+
+**resources\views\admin\dashboard.blade.php**
+
+<img src="./sources/image-30.png" width="450">
+
+### Gestión de ingredientes  
+
+Se desarrolló utilizando Livewire, Volt (componentes de un solo archivo) y Flux (librería UI).
+
+Los componentes cubre las operaciones CRUD completas (crear, ver, actualizar y eliminar), con validaciones y una interfaz basada en modales.
+
+Un modal reutilizable para crear y editar.
+
+Validaciones
+
+UX con <flux:modal>, <flux:input>, <flux:button> y paginación.
+
+
+El mismo formulario sirve para crear (sin id) y editar (con id).
+
+Al guardar, el hijo emite ingrediente-refreshed → el padre cierra modal y refresca la tabla.
+
+### Gestión de Pizzas  
+
+
 ## Extensiones utilizadas en VS Code
 
 ### Livewire Language Support 

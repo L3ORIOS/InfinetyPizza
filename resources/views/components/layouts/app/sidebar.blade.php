@@ -19,8 +19,12 @@
                     <flux:navlist.item icon="chart-pie" href="" >
                         Gestión de Pizzas
                     </flux:navlist.item>
-                    <flux:navlist.item icon="tag" href=""  >
-                        Gestión de Ingredientes
+                    <flux:navlist.item
+                        icon="tag"
+                        :href="route('admin.ingredientes.index')"
+                        :current="request()->routeIs('admin.ingredientes.index')"
+                        wire:navigate>{{ __('Ingredientes') }}
+
                     </flux:navlist.item>
                     <flux:navlist.item icon="currency-euro" href="" >
                         Ver Pedidos
