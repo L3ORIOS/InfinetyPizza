@@ -46,6 +46,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
     Route::get('/pizzas/nueva', \App\Livewire\Admin\Pizzas\Form::class)->name('admin.pizzas.create');
     Route::get('/pizzas/{pizza}/editar', \App\Livewire\Admin\Pizzas\Form::class)->name('admin.pizzas.edit');
 
+    Route::get('/pedidos', \App\Livewire\Admin\Pedidos\Index::class)->name('admin.pedidos.index');
+
 
 });
 require __DIR__.'/auth.php';

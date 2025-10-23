@@ -47,6 +47,9 @@ Prueba Técnica – Desarrollador/a Laravel + Livewire
             - [Index.blade.php (Pizzas - Vista Livewire)](#indexbladephp-pizzas---vista-livewire)
             - [Form.php (Pizzas - Clase Livewire)](#formphp-pizzas---clase-livewire)
             - [Form.blade.php (Pizzas - Vista Livewire)](#formbladephp-pizzas---vista-livewire)
+    - [Listado Pedidos](#listado-pedidos)
+        - [Index.php (Pedidos - Clase Livewire)](#indexphp-pedidos---clase-livewire)
+        - [Index.blade.php (Pedidos - Vista Livewire)](#indexbladephp-pedidos---vista-livewire)
 
    
 
@@ -639,6 +642,50 @@ Componente hijo encargado de crear o editar una pizza, con asignación de ingred
     - Validaciones visuales y errores (@error('campo')).
     - Botón de acción principal <flux:button type="submit"> con texto dinámico:
         - “Crear pizza” o “Guardar cambios”.
+
+
+### Listado Pedidos
+
+Ver Pedidos permite a los administradores visualizar todos los pedidos realizados por los usuarios. Cada pedido muestra el cliente, la pizza solicitada, la fecha/hora del pedido y la fecha de creación del registro.
+
+<img src="./sources/image-45.png" width="450">
+
+##### Index.php (Pedidos - Clase Livewire)
+
+<img src="./sources/image-46.png" width="450">
+
+- **use WithPagination;**
+    - Permite utilizar ->paginate() en las consultas de Eloquent.
+    - Gestiona automáticamente la paginación reactiva, actualizando el listado sin recargar la página.
+
+- **Método render():**
+    - Obtiene los pedidos más recientes y los muestra paginados (5 por página).
+    - Carga relaciones con usuario y pizza para evitar consultas N+1:
+        - Relaciones cargadas:
+            - user: muestra el nombre y correo del cliente.
+            - pizza: muestra el nombre de la pizza asociada al pedido.
+
+##### Index.blade.php (Pedidos - Vista Livewire)
+
+<img src="./sources/image-46.png" width="450">
+
+- Encabezado:
+    -Muestra el título “Listado de Pedidos”.
+
+- Tabla de datos:
+    - Columnas:
+        - ID: identificador del pedido.
+        - Cliente: nombre y correo del usuario que realizó el pedido.
+        - Pizza: nombre de la pizza solicitada.
+        - Fecha del pedido: valor de la columna fecha_hora_pedido (formateado con Carbon::parse()->format('d/m/Y H:i')).
+        - Creado: tiempo relativo (diffForHumans()).
+
+    - Cuando no existen pedidos, se muestra el mensaje:
+        - No hay pedidos registrados.
+
+- Paginación:
+    - Implementada con {{ $pedidos->links() }} al final de la tabla.
+    - Reactiva gracias a WithPagination.
 
 ## Extensiones utilizadas en VS Code
 

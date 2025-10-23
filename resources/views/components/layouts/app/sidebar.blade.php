@@ -32,8 +32,13 @@
                         >
                         {{ __('Gestión de Ingredientes') }}
                     </flux:navlist.item>
-                    <flux:navlist.item icon="currency-euro" href="" >
-                        Ver Pedidos
+                    <flux:navlist.item
+                    icon="currency-euro"
+                    :href="route('admin.pedidos.index')"
+                    :current="request()->routeIs('admin.pedidos.*')"
+                    wire:navigate
+                    >
+                    {{ __('Ver Pedidos') }}
                     </flux:navlist.item>
 
                 </flux:navlist.group>
