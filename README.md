@@ -50,6 +50,12 @@ Prueba Técnica – Desarrollador/a Laravel + Livewire
     - [Listado Pedidos](#listado-pedidos)
         - [Index.php (Pedidos - Clase Livewire)](#indexphp-pedidos---clase-livewire)
         - [Index.blade.php (Pedidos - Vista Livewire)](#indexbladephp-pedidos---vista-livewire)
+- [Catálogo de Pizzas (vista pública y cliente)](#catálogo-de-pizzas-vista-pública-y-cliente)
+    - [ListaPizzas.php (Lista Pizzas - Clase Livewire)](#listapizzasphp-lista-pizzas---clase-livewire)
+    - [ListaPizzas.blade.php (Lista Pizzas - Vista Livewire)](#listapizzasbladephp-lista-pizzas---vista-livewire)
+- [Notificaciones](#notificaciones)
+    - [toast.blade.php](#toastbladephp)
+    - [Implementación](#implementación)    
 
    
 
@@ -686,6 +692,102 @@ Ver Pedidos permite a los administradores visualizar todos los pedidos realizado
 - Paginación:
     - Implementada con {{ $pedidos->links() }} al final de la tabla.
     - Reactiva gracias a WithPagination.
+
+
+## Catálogo de Pizzas (vista pública y cliente)
+
+Este componente Livewire que lista las pizzas disponibles, permite realizar pedidos (solo si el usuario está autenticado).
+Se reutiliza tanto en la página pública (welcome) como dentro del dashboard del cliente, manteniendo la misma interfaz y comportamiento.
+Utiliza Flux Callout para el diseño de las tarjetas y TailwindCSS para la disposición en cuadrícula.
+
+**Welcome.blade.php**
+
+<img src="./sources/image-48.png" width="450">
+
+<img src="./sources/image-49.png" width="450">
+
+**dashboard.blade.php**
+
+<img src="./sources/image-50.png" width="450">
+
+
+### ListaPizzas.php (Lista Pizzas - Clase Livewire)
+
+<img src="./sources/image-51.png" width="450">
+
+**Propiedades**
+
+- **public $pizzas; :**  contiene la colección de pizzas renderizadas.
+
+- **mount() :**  Carga las pizzas con sus ingredientes.
+    - Ordena por más recientes primero.
+    - Selecciona solo los campos necesarios:
+
+- **order(int $pizzaId)**
+
+    - Si el usuario no está autenticado, redirige al login.
+    - Si está autenticado, crea un nuevo registro en Pedido con fecha_hora_pedido = now().
+    - Envía un evento de toast reutilizable para notificar el éxito:
+        - **$this->dispatch('toast', message: "¡Pedido de {$pizza->name} creado!", type: 'success');**
+
+- **render()**
+    - Retorna la vista livewire.client.pizzas.lista-pizzas.
+
+### ListaPizzas.blade.php (Lista Pizzas - Vista Livewire)
+
+<img src="./sources/image-52.png" width="450">
+
+
+- Encabezado
+    - Título: “Pizzas disponibles”.
+
+- Grid (TailwindCSS)
+    - Diseño responsive con 1, 2 o 3 columnas según el tamaño de pantalla:
+        - **< div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3"> ... < /div >**
+
+- Tarjeta (Flux Callout)
+    - Muestra:
+        - Nombre y precio
+        - Imagen (placeholder /order.png o $pizza->image)
+        - Descripción
+        - Ingredientes
+        - Incluye un botón “Hacer pedido” que ejecuta:
+            - wire:click="order({{ $pizza->id }})"
+
+## Notificaciones
+
+El sistema de notificaciones se diseñado para proporcionar feedback visual inmediato al usuario en distintas acciones (crear, editar, eliminar, pedir pizza, etc.).
+
+<img src="./sources/image-54.png" width="450">
+
+
+Se implementa a través de un componente Blade reutilizable (toast.blade.php) que escucha eventos del navegador emitidos por Livewire y muestra un Flux Callout flotante según el tipo de mensaje.
+
+### toast.blade.php
+
+<img src="./sources/image-53.png" width="450">
+
+**Ubicación :** resources/views/components/ui/toast.blade.php
+
+**Características**
+
+- Posición fija en la pantalla (bottom-4 right-4 z-50).
+- Se muestra automáticamente al recibir el evento toast.
+- Desaparece después de 2.5 segundos con una transición suave (x-transition).
+- Utiliza Flux Callout para mantener coherencia visual con el resto de la interfaz.
+- Maneja tres variantes:
+    - success → acción completada correctamente.
+    - error → error, eliminación o acción denegada.
+    - info → mensaje informativo.
+
+### Implementación
+
+Para que el componente funcione globalmente, se incluye una sola vez en los layouts base del proyecto (resources/views/layouts/app.blade.php).
+
+**Uso**
+Desde cualquier componente Livewire, se puede disparar un mensaje con:
+
+**$this->dispatch('toast', message: 'Ingrediente guardado correctamente.', type: 'success');**
 
 ## Extensiones utilizadas en VS Code
 

@@ -47,7 +47,7 @@ new class extends Component {
     public function delete(int $id): void
     {
         Ingrediente::findOrFail($id)->delete();
-
+        $this->dispatch('toast', message: 'Ingrediente eliminado correctamente.', type: 'error');
     }
 }; ?>
 
@@ -123,8 +123,8 @@ new class extends Component {
                                         variant="danger"
                                         size="sm"
                                         icon="trash"
-                                        wire:click="delete({{ $ingrediente->id }})"
-                                        onclick="return confirm('¿Estás seguro de que deseas eliminar este ingrediente?')"
+                                        x-data
+                                        x-on:click.prevent="if (confirm('¿Estás seguro de que deseas eliminar este ingrediente?')) { $wire.delete({{ $ingrediente->id }}) }"
                                     >
                                         {{ __('Eliminar') }}
                                     </flux:button>

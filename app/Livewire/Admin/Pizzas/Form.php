@@ -74,15 +74,18 @@ class Form extends Component
 
         if ($this->pizzaId) {
             $this->pizza->update($data);
+            $this->dispatch('toast', message: 'Pizza editada correctamente.', type: 'success');
         } else {
             $this->pizza = Pizza::create($data);
             $this->pizzaId = $this->pizza->id;
+            $this->dispatch('toast', message: 'Pizza guardada correctamente.', type: 'success');
         }
 
         $this->pizza->ingredientes()->sync($this->ingredientesSeleccionados);
 
         // Avisar al padre (Index) para cerrar el modal y refrescar
         $this->dispatch('pizza-refreshed');
+
     }
 
     public function render()

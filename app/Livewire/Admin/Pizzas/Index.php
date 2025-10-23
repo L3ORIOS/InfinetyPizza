@@ -5,6 +5,7 @@ namespace App\Livewire\Admin\Pizzas;
 use Livewire\Component;
 
 use App\Models\Pizza;
+use App\Models\Pedidos;
 use Livewire\WithPagination;
 use Livewire\Attributes\On;
 
@@ -41,8 +42,20 @@ class Index extends Component
 
     public function delete(int $id): void
     {
-        Pizza::findOrFail($id)->delete();
-    }
+       $pizza = Pizza::withCount('pedidos')->findOrFail($id);
+
+        if ($pizza->pedidos_count > 0) {
+            $this->dispatch('toast', message: 'No puedes eliminar una pizza con pedidos asociados.', type: 'error');
+            return;
+        }
+
+        // Quita relaciones de la tabla pivot para no romper FKs
+        $pizza->ingredientes()->detach();
+
+        $pizza->delete();
+
+        $this->dispatch('toast', message: 'Pizza eliminada correctamente.', type: 'success');
+        }
 
     public function render()
     {
