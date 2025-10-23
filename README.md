@@ -7,6 +7,7 @@ Prueba Técnica – Desarrollador/a Laravel + Livewire
 ## Índice
 
 - [Introducción](#introducción)
+- [Usuarios de prueba](#usuarios-de-prueba)
 - [Instalación](#instalación)
     - [Comandos](#comandos)
 - [Base de datos](#base-de-datos)
@@ -56,12 +57,38 @@ Prueba Técnica – Desarrollador/a Laravel + Livewire
 - [Notificaciones](#notificaciones)
     - [toast.blade.php](#toastbladephp)
     - [Implementación](#implementación)    
+- [Envío de Correo Automático al Crear un Pedido](#envío-de-correo-automático-al-crear-un-pedido)
+    - [Evento](#evento)
+    - [Listener](#listener)    
+    - [Job](#job)    
+    - [Mailable](#mailable)    
+    - [Vista Mail (Markdown Mail)](#vista-mail-markdown-mail)    
+    - [Implementación en ListaPizzas](#implementación-en-listapizzas)    
+    - [Integración del Listener](#integración-del-listener)    
+    - [Cómo emplear y probar](#cómo-emplear-y-probar)    
+    - [Resultado final](#resultado-final)    
 
    
 
 ## Introducción
 
 Repositorio de Infinety Pizza, aplicación desarrollada como prueba técnica, cuyo objetivo es gestionar de forma sencilla la venta de pizzas.
+
+## Usuarios de prueba
+
+El sistema incluye dos usuarios generados automáticamente por el seeder de base de datos.
+Estas credenciales pueden usarse para probar el flujo completo de la aplicación, tanto desde el panel de administración como desde la vista del cliente.
+
+ **Administrador** 
+- Admin Infinety 
+- `admin@infinety.com` 
+- `password123`
+
+**Cliente**
+- Test User      
+- `test@example.com`   
+- `password`                         
+
 
 ## Instalación
 
@@ -789,15 +816,178 @@ Desde cualquier componente Livewire, se puede disparar un mensaje con:
 
 **$this->dispatch('toast', message: 'Ingrediente guardado correctamente.', type: 'success');**
 
-## Extensiones utilizadas en VS Code
 
-### Livewire Language Support 
+## Envío de Correo Automático al Crear un Pedido
 
-### Laravel
+El sistema de **Infinety Pizza** envía un correo automático al usuario cada vez que realiza un pedido.  
+Este proceso se implementó utilizando eventos, listeners, jobs y mailables de Laravel, en conjunto con **colas (queues)** para un manejo asíncrono.
 
-Official Laravel VS Code Extension 
+---
 
-### Capture Code
-### SQLite Viewer
+### Evento
+
+**app/Events/OrderCreated.php**
+
+<img src="./sources/image-55.png" width="450">
+
+La propiedad `public Pedido $pedido`, se instancia desde Livewire al crear un pedido.
+
+El evento **OrderCreated** se dispara cada vez que se registra un nuevo pedido en la base de datos.  
+Su función principal es encapsular el objeto del pedido (**Pedido**) y notificar al sistema de que se ha producido una nueva orden.
+
+- Se crea automáticamente al generar un pedido desde el componente **ListaPizzas**.
+- Actúa como punto de conexión entre la capa de negocio (pedido creado) y los procesos automáticos posteriores (correo, notificación, etc.).
+
+---
+
+### Listener
+
+El listener `QueueSendOrderEmail` se encarga de **responder al evento** `OrderCreated`.  
+Su único propósito es **encolar un job** que realizará el envío real del correo.
+
+- Escucha el evento automáticamente gracias al registro (`withEvents()` en `bootstrap/app.php`).
+- Recibe el objeto `$pedido` y lanza el job `SendOrderEmail`.
+- Su ejecución es inmediata, pero el envío del correo se hace en segundo plano a través de la cola.
+
+**app/Listeners/QueueSendOrderEmail.php**
+
+<img src="./sources/image-56.png" width="450">
+
+Listener que recibe el evento y despacha el job con `SendOrderEmail::dispatch($event->pedido)`.
+
+---
+
+### Job
+
+El job `SendOrderEmail` se ejecuta en segundo plano (asíncronamente) gracias a **Laravel Queues**.  
+Es el encargado de **construir el correo y enviarlo al usuario**.
+
+- Carga las relaciones necesarias del pedido (usuario, pizza e ingredientes).
+- Utiliza el mailable `OrderSummaryMail` para componer el mensaje.
+- Implementa la interfaz `ShouldQueue`, lo que permite procesarlo sin bloquear el flujo principal de la aplicación.
+
+**app/Jobs/SendOrderEmail.php**
+
+<img src="./sources/image-57.png" width="450">
+
+El job ejecuta `Mail::to($pedido->user->email)->send(new OrderSummaryMail($pedido));`
+
+---
+
+### Mailable
+
+`OrderSummaryMail` es la clase que define el contenido y la estructura del correo que recibirá el usuario.
+
+- Se implementa utilizando (`envelope()` y `content()`).
+- El asunto se define en `envelope()`.
+- El contenido y las variables (como `$pedido`) se pasan en `content()`.
+- Utiliza plantillas Markdown nativas de Laravel, lo que facilita la personalización visual del correo.
+
+**app/Mail/OrderSummaryMail.php**
+
+<img src="./sources/image-59.png" width="450">
+
+`subject: 'Resumen de tu pedido - Infinety Pizza'` y vista `mail.order-summary`.
+
+---
+
+### Vista Mail (Markdown Mail)
+
+La vista `resources/views/mail/order-summary.blade.php` define el cuerpo visual del correo.  
+Está escrita usando componentes Blade como `<x-mail::message>` y `<x-mail::button>`, los cuales se renderizan con el estilo nativo de los correos de Laravel.
+
+- Muestra el nombre del usuario, la pizza, los ingredientes y la fecha del pedido.
+- Incluye un botón de acción con un enlace configurable (por ejemplo, “Ver mi cuenta”).
+- Se adapta automáticamente a versiones móviles y clientes de correo.
+
+**resources/views/mail/order-summary.blade.php**
+
+<img src="./sources/image-58.png" width="450">
+
+Correo con saludo, resumen del pedido y botón de acceso al sitio.
+
+---
+
+### Configuración del entorno (.env)
+
+Durante el desarrollo, se utiliza el **Log Mailer** de Laravel.  
+Esto permite simular el envío de correos sin necesidad de un servidor SMTP real.
+
+```env
+MAIL_MAILER=log
+MAIL_FROM_ADDRESS="no-reply@infinetypizza.test"
+MAIL_FROM_NAME="Infinety Pizza"
+```
+
+- Los correos se registran en el archivo:  
+  `storage/logs/laravel.log`
+- En producción, basta con cambiar `MAIL_MAILER=smtp` y agregar las credenciales reales.
+
+---
+
+### Implementación en `ListaPizzas`
+
+Dentro del componente `App\Livewire\Client\Pizzas\ListaPizzas`, al crear un nuevo pedido se dispara el evento `OrderCreated`.
+
+- Se crea el registro del pedido en la base de datos.
+- Se lanza el evento mediante `OrderCreated::dispatch($pedido);`
+- El listener toma el control y encola el job para enviar el correo.
+
+<img src="./sources/image-60.png" width="450">
+
+Método `order()` con la creación del pedido y la llamada al evento.
+
+---
+
+###  Integración del Listener
+
+Los listeners se registrarse automáticamente gracias a la configuración del archivo `bootstrap/app.php`.
+
+```php
+->withEvents(discover: [
+    __DIR__.'/../app/Listeners',
+])
+```
+
+- Esto permite que Laravel **detecte automáticamente** los listeners dentro del directorio especificado.
+
+
+---
+
+### Cómo emplear y probar
+
+- Se configura el **driver de colas**:
+   ```env
+   QUEUE_CONNECTION=database
+   ```
+   (y migrada la tabla `jobs` con `php artisan queue:table` + `php artisan migrate`).
+
+- Inicia el **worker de colas** en una terminal:
+   ```bash
+   php artisan queue:work
+   ```
+
+- Desde la interfaz del cliente o administrador, hay que realiza un nuevo pedido.
+
+- En el archivo `storage/logs/laravel.log` se puede ver el correo registrado.
+
+ 
+
+Salida del log con asunto, destinatario y cuerpo del correo.
+
+---
+
+### Resultado final
+
+Cada vez que un usuario realiza un pedido:
+1. Se crea el registro del pedido.
+2. Se dispara el evento `OrderCreated`.
+3. Se encola y ejecuta el job `SendOrderEmail`.
+4. Se genera un correo con el resumen del pedido.
+5. El contenido se registra en los logs.
+
+
+
+
 - [ ]
 
