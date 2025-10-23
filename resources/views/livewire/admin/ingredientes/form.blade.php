@@ -58,6 +58,7 @@ new class extends Component {
 
             // avisa al padre
             $this->dispatch('ingrediente-refreshed');
+            $this->dispatch('toast', message: 'Ingrediente editado correctamente.', type: 'success');
             $this->reset('name');
             Flux::modals()->close();
 
@@ -65,6 +66,7 @@ new class extends Component {
             Ingrediente::create(['name' => $this->name]);
             $this->dispatch('ingrediente-refreshed');
             $this->reset('name');
+            $this->dispatch('toast', message: 'Ingrediente guardado correctamente.', type: 'success');
             Flux::modals()->close();
         }
     }

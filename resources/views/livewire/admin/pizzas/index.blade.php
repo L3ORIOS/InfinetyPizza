@@ -81,7 +81,8 @@
                                         size="sm"
                                         icon="trash"
                                         x-data
-                                        @click="if (confirm('¿Eliminar esta pizza?')) { $wire.delete({{ $pizza->id }}) }"
+
+                                        x-on:click.prevent="if (confirm('¿Estás seguro de que deseas eliminar esta pizza?')) { $wire.delete({{ $pizza->id }}) }"
                                     >
                                         {{ __('Eliminar') }}
                                     </flux:button>
