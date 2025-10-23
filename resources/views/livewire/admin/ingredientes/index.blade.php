@@ -3,7 +3,7 @@
 use Livewire\Volt\Component;
 use App\Models\Ingrediente;
 use Livewire\WithPagination;
-use Livewire\Attributes\On; // Importar si se usa 'On'
+use Livewire\Attributes\On;
 
 
 new class extends Component {
@@ -11,9 +11,10 @@ new class extends Component {
     use WithPagination;
 
     // Control del modal + id en edición
-    public bool $showModal = false;
-    public ?int $editingId = null;
+    public bool $showModal = false; // Visible/invisible del modal
+    public ?int $editingId = null; // Null = crear; ID = editar
 
+    // Data binding (lista paginada, ordenada por más recientes)
     public function with(): array
     {
         return [
@@ -40,20 +41,19 @@ new class extends Component {
     public function ingredienteRefreshed(): void
     {
         $this->resetPage();
-        $this->reset('showModal', 'editingId');
+        //$this->reset('showModal', 'editingId');
     }
 
     public function delete(int $id): void
     {
         Ingrediente::findOrFail($id)->delete();
-        // Si borras el último de la página, podrías ajustar la paginación si quieres
+
     }
 }; ?>
 
 <!-- CONTENIDO PRINCIPAL -->
 <div>
     <div>
-
         {{-- Encabezado y Botón de Crear --}}
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-3xl font-semibold text-gray-500 dark:text-gray-100">
@@ -119,7 +119,13 @@ new class extends Component {
                                         {{ __('Editar') }}
                                     </flux:button>
 
-                                    <flux:button variant="danger" size="sm" icon="trash" wire:click="delete({{ $ingrediente->id }})">
+                                    <flux:button
+                                        variant="danger"
+                                        size="sm"
+                                        icon="trash"
+                                        wire:click="delete({{ $ingrediente->id }})"
+                                        onclick="return confirm('¿Estás seguro de que deseas eliminar este ingrediente?')"
+                                    >
                                         {{ __('Eliminar') }}
                                     </flux:button>
                                 </div>

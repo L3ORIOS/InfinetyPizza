@@ -16,15 +16,21 @@
                 <flux:navlist.group :heading="__('Administración')" class="grid">
 
 
-                    <flux:navlist.item icon="chart-pie" href="" >
-                        Gestión de Pizzas
+                    <flux:navlist.item
+                        icon="chart-pie"
+                        :href="route('admin.pizzas.index')"
+                        :current="request()->routeIs('admin.pizzas.*')"
+                        wire:navigate
+                        >
+                          {{ __('Gestión de Pizzas') }}
                     </flux:navlist.item>
                     <flux:navlist.item
                         icon="tag"
                         :href="route('admin.ingredientes.index')"
                         :current="request()->routeIs('admin.ingredientes.index')"
-                        wire:navigate>{{ __('Ingredientes') }}
-
+                        wire:navigate
+                        >
+                        {{ __('Gestión de Ingredientes') }}
                     </flux:navlist.item>
                     <flux:navlist.item icon="currency-euro" href="" >
                         Ver Pedidos

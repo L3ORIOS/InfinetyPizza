@@ -39,12 +39,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->group(function () {
         return view('admin.dashboard'); // Crea esta vista
     })->name('admin.dashboard');
 
-    // Rutas para la gestión de CRUDs (Pizzas, Ingredientes, etc.)
-    // Route::resource('pizzas', App\Http\Controllers\PizzaController::class);
-    // Route::resource('ingredientes', App\Http\Controllers\IngredienteController::class);
+
     Volt::route('ingredientes', 'admin.ingredientes.index')->name('admin.ingredientes.index');
-    //Volt::route('ingredientes/create', 'admin.ingredientes.create')->name('admin.ingredientes.create');
-    Volt::route('ingredientes/edit', 'admin.ingredientes.edit')->name('admin.ingredientes.edit');
+
+    Route::get('/pizzas', \App\Livewire\Admin\Pizzas\Index::class)->name('admin.pizzas.index');
+    Route::get('/pizzas/nueva', \App\Livewire\Admin\Pizzas\Form::class)->name('admin.pizzas.create');
+    Route::get('/pizzas/{pizza}/editar', \App\Livewire\Admin\Pizzas\Form::class)->name('admin.pizzas.edit');
+
 
 });
 require __DIR__.'/auth.php';
