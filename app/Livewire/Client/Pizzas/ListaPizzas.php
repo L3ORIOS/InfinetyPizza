@@ -8,6 +8,9 @@ use App\Models\Pedido;
 use App\Models\Pizza;
 use Illuminate\Support\Facades\Auth;
 
+use App\Events\OrderCreated;
+
+
 class ListaPizzas extends Component
 {
     public $pizzas;
@@ -30,11 +33,14 @@ class ListaPizzas extends Component
 
         $pizza = Pizza::findOrFail($pizzaId);
         // Crear pedido rápido (fecha/hora = ahora)
-        Pedido::create([
+        $pedido = Pedido::create([
             'user_id'            => Auth::id(),
             'pizza_id'           => $pizzaId,
             'fecha_hora_pedido'  => now(),
         ]);
+
+            // Disparar el evento → Listener encola el Job → Job envía el mail
+            OrderCreated::dispatch($pedido);
 
         //$this->dispatch('pedido-ok', message: "¡Pedido de {$pizza->name} creado!");
         $this->dispatch('toast', message: "¡Pedido de {$pizza->name} creado!", type: 'success');
