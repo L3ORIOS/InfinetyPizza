@@ -57,14 +57,13 @@ new class extends Component {
                 ->update(['name' => $this->name]);
 
             // avisa al padre
-            $this->dispatch('ingrediente-refreshed', action: 'updated');
+            $this->dispatch('ingrediente-refreshed');
             $this->reset('name');
             Flux::modals()->close();
 
         } else {
             Ingrediente::create(['name' => $this->name]);
-            $this->dispatch('ingrediente-refreshed', action: 'created');
-            // si quieres limpiar después de crear dentro del modal:
+            $this->dispatch('ingrediente-refreshed');
             $this->reset('name');
             Flux::modals()->close();
         }
